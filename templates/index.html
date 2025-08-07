@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        :root {
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --background-color: #ecf0f1;
+            --container-bg: #ffffff;
+            --text-color: #34495e;
+            --fake-color: #e74c3c;
+            --reliable-color: #2ecc71;
+            --border-color: #bdc3c7;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 650px;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto 0;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #prediction-result {
+            margin-top: 30px;
+            font-size: 22px;
+            font-weight: 500;
+            min-height: 30px;
+        }
+        
+        .fake { color: var(--fake-color); }
+        .reliable { color: var(--reliable-color); }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📰 Fake News Detector 📰</h1>
+        <form id="news-form">
+            <textarea id="news-text" name="news_text" placeholder="Paste the news article text here and click verify..." required></textarea>
+            <br>
+            <button type="submit">Verify News</button>
+        </form>
+
+        <div class="loader" id="loader"></div>
+        <div id="prediction-result"></div>
+    </div>
+     
+    <script>
+        const form = document.getElementById('news-form');
+        const loader = document.getElementById('loader');
+        const resultDiv = document.getElementById('prediction-result');
+        const newsTextarea = document.getElementById('news-text');
+
+        form.addEventListener('submit', function(event) {
+            // Prevent the default form submission (page reload)
+            event.preventDefault();
+
+            // Show loader and clear previous result
+            loader.style.display = 'block';
+            resultDiv.innerHTML = '';
+            resultDiv.className = '';
+
+            // Get form data
+            const formData = new FormData(form);
+
+            // Send data to the server using Fetch API
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loader
+                loader.style.display = 'none';
+                
+                if (data.error) {
+                    resultDiv.innerHTML = `<p class="fake">${data.error}</p>`;
+                } else {
+                    // Display the prediction
+                    resultDiv.innerHTML = `<p>${data.prediction_text}</p>`;
+                    // Add class for color styling
+                    resultDiv.classList.add(data.label);
+                }
+                
+                // Clear the textarea after receiving a response
+                newsTextarea.value = '';
+            })
+            .catch(error => {
+                // Hide loader and show an error message
+                loader.style.display = 'none';
+                resultDiv.innerHTML = `<p class="fake">An error occurred. Please try again.</p>`;
+                console.error('Error:', error);
+                // Also clear the text on error
+                newsTextarea.value = '';
+            });
+        });
+    </script>
+</body>
+</html>
