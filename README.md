@@ -47,3 +47,43 @@ The project follows a clear separation of concerns:
 ```bash
 git clone [https://github.com/SaravanaKumar056/fake_news_detect.git](https://github.com/SaravanaKumar056/fake_news_detect.git)
 cd fake_news_detect
+
+
+2. Install Dependencies
+Bash
+
+pip install -r requirements.txt
+3. Train the Model (Optional)
+Note: The repo comes with a pre-trained model, but you can retrain it using the dataset.
+
+Bash
+
+python train.py
+# Output: "Success! You can now run app.py."
+4. Start the Application
+Bash
+
+python app.py
+# Output: * Running on [http://127.0.0.1:5000](http://127.0.0.1:5000)
+5. Verify
+Open your browser and go to http://127.0.0.1:5000. Enter a news headline to see the prediction!
+
+ Performance Metrics
+During the training phase, the model was evaluated on a split test set:
+
+Logistic Regression: 99% Accuracy
+
+Decision Tree: 99% Accuracy
+
+Gradient Boosting: 99% Accuracy
+
+Random Forest: 99% Accuracy
+
+The production app currently uses Logistic Regression for its balance of speed and accuracy.
+
+Future Improvements
+Dockerization: Containerize the application for cloud deployment (AWS/Azure).
+
+Deep Learning: Implement an LSTM or BERT-based model for better context understanding.
+
+CI/CD: Set up GitHub Actions for automated testing and deployment.
